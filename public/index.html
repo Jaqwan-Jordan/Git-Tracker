@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Git Tracker</title>
+</head>
+<body>
+  <h1>Git Tracker</h1>
+  <form id="repo-form">
+    <input type="text" id="owner" placeholder="GitHub Owner" required>
+    <input type="text" id="repo" placeholder="GitHub Repository" required>
+    <button type="submit">Get Commits</button>
+  </form>
+
+  <ul id="commit-list"></ul>
+
+  <script>
+    const form = document.getElementById('repo-form');
+    const commitList = document.getElementById('commit-list');
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      const owner = document.getElementById('owner').value;
+      const repo = document.getElementById('repo').value;
+
+      try {
+        const response = await fetch(`/commits?owner=${owner}&repo=${repo}`);
+        const commits = await response.json();
+
+        commitList.innerHTML = '';
+        commits.forEach(commit => {
+          const li = document.createElement('li');
+          li.textContent = `${commit.committer.login} - ${commit.commit.committer.date} - ${commit.commit.message}`;
+          commitList.appendChild(li);
+        });
+      } catch (error) {
+        commitList.innerHTML = '<li>Failed to fetch commits.</li>';
+      }
+    });
+  </script>
+</body>
+</html>
